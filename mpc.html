@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Células Cristãs - Escolas</title>
+    
+    <!-- CSS do Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #map { height: 100vh; width: 100%; }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        .popup-container {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        
+        .popup-title {
+            margin: 0;
+            font-size: 15px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .popup-address {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <!-- JS do Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // 1. INICIALIZANDO O MAPA (Centro definido para englobar Plano Piloto e Ceilândia)
+        const map = L.map('map').setView([-15.793889, -47.950000], 11);
+
+        // 3. ADICIONANDO A CAMADA DE MAPA DO OPENSTREETMAP
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 4. CONFIGURAÇÃO DE STATUS E CORES
+        const statusConfig = {
+            'ATIVO': '#28a745',           // Verde
+            'ACOMPANHADO': '#007bff',     // Azul
+            'DESATIVADO': '#dc3545',      // Vermelho
+            'SEM INFORMAÇÕES': '#6c757d'  // Cinza
+        };
+
+        function gerarIconeCustomizado(status) {
+            const cor = statusConfig[status] || statusConfig['SEM INFORMAÇÕES'];
+            return L.divIcon({
+                className: 'custom-marker',
+                html: `<svg width="28" height="42" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 8.25 12 24 12 24s12-15.75 12-24C24 5.373 18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="${cor}" stroke="#ffffff" stroke-width="2"/>
+                       </svg>`,
+                iconSize: [28, 42],
+                iconAnchor: [14, 42], 
+                popupAnchor: [0, -42] 
+            });
+        }
+
+        // 5. LISTA DE CÉLULAS E COORDENADAS CONVERTIDAS
+        // Altere o status conforme a realidade atual de cada célula
+        const celulasEscolares = [
+            { 
+                nome: "FIRE", 
+                endereco: "704/904 Seps Eq 702/902", 
+                lat: -15.802449786329907, lon: -47.89940310012991, 
+                status: "ATIVO" 
+            },
+            { 
+                nome: "AVIVA CEMSO", 
+                endereco: "Mod D - Asa Sul", 
+                lat: -15.815634955806981, lon: -47.91962608473196, 
+                status: "ATIVO"
+            },
+            { 
+                nome: "UNAI", 
+                endereco: "Colégio Militar de Brasília - 902/904 Asa Norte", 
+                lat: -15.779456881651777, lon: -47.89300, 
+                status: "ACOMPANHADO" 
+            },
+            { 
+                nome: "Andamento", 
+                endereco: "SPO, SHCS - Plano Piloto", 
+                lat:-15.833929894133584, lon: -47.9391698422606,
+                status: "ACOMPANHADO" 
+            },
+            { 
+                nome: "NVC", 
+                endereco: "Plano Piloto (64MH+M4)", 
+                lat:  -15.763914498737428, lon:  -47.87207721349224,
+                status: "ACOMPANHADO" 
+            },
+            { 
+                nome: "Vinde", 
+                endereco: "Ceilândia (5V4X+99)", 
+                lat: -15.843889802538921, lon: -48.1016329911501,
+                status: "ATIVO" 
+            }
+        ];
+
+        // 6. RENDERIZANDO OS MARCADORES NO MAPA
+        celulasEscolares.forEach(celula => {
+            const corBadge = statusConfig[celula.status] || statusConfig['SEM INFORMAÇÕES'];
+            
+            const conteudoPopup = `
+                <div class="popup-container">
+                    <h3 class="popup-title">${celula.nome}</h3>
+                    <div class="popup-address">${celula.endereco}</div>
+                    <span class="status-badge" style="background-color: ${corBadge};">
+                        ${celula.status}
+                    </span>
+                </div>
+            `;
+
+            L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
+                .addTo(map)
+                .bindPopup(conteudoPopup);
+        });
+    </script>
+</body>
+</html>
