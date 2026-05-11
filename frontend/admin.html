@@ -117,11 +117,14 @@
 
         document.getElementById('form-celula').addEventListener('submit', async function(e) {
             e.preventDefault(); 
-            
-            const idSelecionado = document.getElementById('celula-id').value;
-            let dadosParaSalvar = {};
 
-            // VERIFICA SE É UM NOVO OU UMA ATUALIZAÇÃO DOS BASE
+            const idSelecionado = document.getElementById('celula-id').value;
+
+            // 1) monta payload
+            let payload = null;
+            let metodo = 'POST';
+            let url = 'https://mapa-celulas-v2.onrender.com/api/celulas';
+
             if (idSelecionado === 'novo') {
                 const lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
                 const lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
@@ -131,7 +134,7 @@
                     return;
                 }
 
-                dadosParaSalvar = {
+                payload = {
                     nome: document.getElementById('novo-nome').value,
                     endereco: document.getElementById('novo-endereco').value,
                     lat,
@@ -144,7 +147,7 @@
                 };
             } else {
                 const infoBase = dadosBase[idSelecionado];
-                dadosParaSalvar = {
+                payload = {
                     nome: infoBase.nome,
                     endereco: infoBase.endereco,
                     lat: infoBase.lat,
@@ -155,21 +158,26 @@
                     diaFuncionamento: document.getElementById('dia').value,
                     horario: document.getElementById('horario').value
                 };
+
+                metodo = 'PUT';
+                url = `https://mapa-celulas-v2.onrender.com/api/celulas/${idSelecionado}`;
             }
 
             try {
-                const resposta = await fetch('https://mapa-celulas-v2.onrender.com/api/celulas',  {
-                    method: 'POST',
+                const resposta = await fetch(url, {
+                    method: metodo,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dadosParaSalvar)
+                    body: JSON.stringify(payload)
                 });
 
                 if (resposta.ok) {
                     alert('✅ Clubinho salvo com sucesso no Banco de Dados!');
                     document.getElementById('form-celula').reset(); 
-                    document.getElementById('campos-novo').style.display = 'none'; // Esconde a caixa dnv
+                    document.getElementById('campos-novo').style.display = 'none';
+                    window.location.reload();
                 } else {
-                    alert('❌ Erro ao salvar. Verifique se digitou os dados corretamente.');
+                    const text = await resposta.text().catch(() => '');
+                    alert(`❌ Erro ao salvar. ${text}`.trim());
                 }
             } catch (erro) {
                 console.error("Erro na requisição:", erro);
