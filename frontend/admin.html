@@ -100,21 +100,17 @@
         };
 
         // Lógica para mostrar/esconder a caixa de novo cadastro
-        document.getElementById('celula-id').addEventListener('change', function(e) {
+        function atualizarCamposNovo() {
             const caixaNovo = document.getElementById('campos-novo');
-            if (e.target.value === 'novo') {
-                caixaNovo.style.display = 'block';
-                // Deixa os campos obrigatórios se for um novo
-                document.getElementById('novo-nome').required = true;
-                document.getElementById('novo-lat').required = true;
-                document.getElementById('novo-lon').required = true;
-            } else {
-                caixaNovo.style.display = 'none';
-                document.getElementById('novo-nome').required = false;
-                document.getElementById('novo-lat').required = false;
-                document.getElementById('novo-lon').required = false;
-            }
-        });
+            const isNovo = document.getElementById('celula-id').value === 'novo';
+            caixaNovo.style.display = isNovo ? 'block' : 'none';
+            document.getElementById('novo-nome').required = isNovo;
+            document.getElementById('novo-lat').required = isNovo;
+            document.getElementById('novo-lon').required = isNovo;
+        }
+
+        document.getElementById('celula-id').addEventListener('change', atualizarCamposNovo);
+        window.addEventListener('DOMContentLoaded', atualizarCamposNovo);
 
         document.getElementById('form-celula').addEventListener('submit', async function(e) {
             e.preventDefault(); 
@@ -124,12 +120,19 @@
 
             // VERIFICA SE É UM NOVO OU UMA ATUALIZAÇÃO DOS BASE
             if (idSelecionado === 'novo') {
+                const lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
+                const lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
+
+                if (Number.isNaN(lat) || Number.isNaN(lon)) {
+                    alert('Por favor, informe latitude e longitude válidas.');
+                    return;
+                }
+
                 dadosParaSalvar = {
                     nome: document.getElementById('novo-nome').value,
                     endereco: document.getElementById('novo-endereco').value,
-                    // O parseFloat transforma o texto digitado em número decimal (exigido pelo banco)
-                    lat: parseFloat(document.getElementById('novo-lat').value.replace(',', '.')),
-                    lon: parseFloat(document.getElementById('novo-lon').value.replace(',', '.')),
+                    lat,
+                    lon,
                     status: document.getElementById('novo-status').value,
                     telefone: document.getElementById('telefone').value,
                     instagram: document.getElementById('instagram').value,
