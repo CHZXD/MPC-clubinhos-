@@ -152,7 +152,7 @@
             }
 
             try {
-                const resposta = await fetch('http://localhost:8080/api/celulas', {
+                const resposta = await fetch('https://mapa-celulas-v2.onrender.com/api/celulas',  {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dadosParaSalvar)
