@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ApiMapaApplication<api-mapa>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.clubinho.api_mapa.ApiMapaApplication",
+            "projectName": "api-mapa",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -25,6 +25,7 @@
         .popup-container {
             font-family: Arial, sans-serif;
             text-align: center;
+            min-width: 180px; /* Garante um tamanho mínimo legal para o card */
         }
         
         .popup-title {
@@ -38,6 +39,29 @@
             font-size: 11px;
             color: #666;
             margin-top: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Novo estilo para a caixinha de detalhes (Contato e Horário) */
+        .popup-details {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .popup-details p {
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .popup-details strong {
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -49,21 +73,21 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // 1. INICIALIZANDO O MAPA (Centro definido para englobar Plano Piloto e Ceilândia)
+        // 1. INICIALIZANDO O MAPA
         const map = L.map('map').setView([-15.793889, -47.950000], 11);
 
-        // 3. ADICIONANDO A CAMADA DE MAPA DO OPENSTREETMAP
+        // 2. ADICIONANDO A CAMADA DE MAPA DO OPENSTREETMAP
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // 4. CONFIGURAÇÃO DE STATUS E CORES
+        // 3. CONFIGURAÇÃO DE STATUS E CORES
         const statusConfig = {
-            'ATIVO': '#28a745',           // Verde
-            'ACOMPANHADO': '#007bff',     // Azul
-            'DESATIVADO': '#dc3545',      // Vermelho
-            'SEM INFORMAÇÕES': '#6c757d'  // Cinza
+            'ATIVO': '#28a745',          // Verde
+            'ACOMPANHADO': '#007bff',    // Azul
+            'DESATIVADO': '#dc3545',     // Vermelho
+            'SEM INFORMAÇÕES': '#6c757d' // Cinza
         };
 
         function gerarIconeCustomizado(status) {
@@ -79,26 +103,35 @@
             });
         }
 
-        // 5. LISTA DE CÉLULAS E COORDENADAS CONVERTIDAS
-        // Altere o status conforme a realidade atual de cada célula
+        // 4. LISTA DE CÉLULAS (Simulando o que virá do Banco de Dados)
         const celulasEscolares = [
             { 
                 nome: "FIRE", 
                 endereco: "704/904 Seps Eq 702/902", 
                 lat: -15.802449786329907, lon: -47.89940310012991, 
-                status: "ATIVO" 
+                status: "ATIVO",
+                // Novos campos adicionados para teste:
+                telefone: "(61) 99999-1111",
+                instagram: "@fire.seps",
+                dia_funcionamento: "Sexta-feira",
+                horario: "19:30"
             },
             { 
                 nome: "AVIVA CEMSO", 
                 endereco: "Mod D - Asa Sul", 
                 lat: -15.815634955806981, lon: -47.91962608473196, 
-                status: "ATIVO"
+                status: "ATIVO",
+                telefone: "(61) 98888-2222",
+                instagram: "@aviva.cemso",
+                dia_funcionamento: "Sábado",
+                horario: "16:00"
             },
             { 
                 nome: "UNAI", 
                 endereco: "Colégio Militar de Brasília - 902/904 Asa Norte", 
                 lat: -15.779456881651777, lon: -47.89300, 
                 status: "ACOMPANHADO" 
+                // Exemplo sem os dados novos: o popup vai mostrar "Não informado"
             },
             { 
                 nome: "Andamento", 
@@ -120,14 +153,23 @@
             }
         ];
 
-        // 6. RENDERIZANDO OS MARCADORES NO MAPA
+        // 5. RENDERIZANDO OS MARCADORES NO MAPA
         celulasEscolares.forEach(celula => {
             const corBadge = statusConfig[celula.status] || statusConfig['SEM INFORMAÇÕES'];
             
+            // Usamos o operador || 'Não informado' para caso a célula ainda não tenha esse dado cadastrado
             const conteudoPopup = `
                 <div class="popup-container">
                     <h3 class="popup-title">${celula.nome}</h3>
                     <div class="popup-address">${celula.endereco}</div>
+                    
+                    <div class="popup-details">
+                        <p><strong>📞 Tel:</strong> ${celula.telefone || 'Não informado'}</p>
+                        <p><strong>📸 Insta:</strong> ${celula.instagram || 'Não informado'}</p>
+                        <p><strong>📅 Dia:</strong> ${celula.dia_funcionamento || 'Não informado'}</p>
+                        <p><strong>⏰ Hora:</strong> ${celula.horario || 'Não informado'}</p>
+                    </div>
+
                     <span class="status-badge" style="background-color: ${corBadge};">
                         ${celula.status}
                     </span>

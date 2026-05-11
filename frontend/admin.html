@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Atualizar Células</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 450px; margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; color: #333; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { margin-top: 20px; width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        
+        /* Estilo para a área do novo clubinho */
+        #campos-novo {
+            display: none; /* Fica escondido por padrão */
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border: 1px dashed #6c757d;
+        }
+        #campos-novo label { margin-top: 10px; color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Atualizar ou Adicionar Clubinho</h2>
+        <form id="form-celula">
+            
+            <label>Selecione a Célula:</label>
+            <select id="celula-id" required>
+                <option value="novo" style="font-weight: bold; color: blue;">➕ CADASTRAR NOVO CLUBINHO</option>
+                <option value="" disabled>--------------------------</option>
+                <option value="1">FIRE (Seps 702/902)</option>
+                <option value="2">AVIVA CEMSO</option>
+                <option value="3">UNAI</option>
+                <option value="4">Andamento</option>
+                <option value="5">NVC</option>
+                <option value="6">Vinde (Ceilândia)</option>
+            </select>
+
+            <div id="campos-novo">
+                <label>Nome do Novo Clubinho:</label>
+                <input type="text" id="novo-nome" placeholder="Ex: Clubinho Taguatinga">
+                
+                <label>Endereço / Referência:</label>
+                <input type="text" id="novo-endereco" placeholder="Ex: QNB 12, Casa 5">
+                
+                <label>Latitude (Lat):</label>
+                <input type="text" id="novo-lat" placeholder="Ex: -15.8339">
+                
+                <label>Longitude (Lon):</label>
+                <input type="text" id="novo-lon" placeholder="Ex: -47.9391">
+                
+                <label>Status Inicial:</label>
+                <select id="novo-status">
+                    <option value="ATIVO">ATIVO</option>
+                    <option value="ACOMPANHADO">ACOMPANHADO</option>
+                    <option value="SEM INFORMAÇÕES">SEM INFORMAÇÕES</option>
+                    <option value="DESATIVADO">DESATIVADO</option>
+                </select>
+            </div>
+
+            <label>Telefone (WhatsApp):</label>
+            <input type="tel" id="telefone" placeholder="(61) 90000-0000" required>
+
+            <label>Instagram:</label>
+            <input type="text" id="instagram" placeholder="@seu.clubinho" required>
+
+            <label>Dia de Funcionamento:</label>
+            <select id="dia" required>
+                <option value="" disabled selected>Selecione um dia</option>
+                <option value="Segunda-feira">Segunda-feira</option>
+                <option value="Terça-feira">Terça-feira</option>
+                <option value="Quarta-feira">Quarta-feira</option>
+                <option value="Quinta-feira">Quinta-feira</option>
+                <option value="Sexta-feira">Sexta-feira</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+            </select>
+
+            <label>Horário de Início:</label>
+            <input type="time" id="horario" required>
+
+            <button type="submit">Salvar no Banco de Dados</button>
+        </form>
+    </div>
+
+    <script>
+        const dadosBase = {
+            "1": { nome: "FIRE", endereco: "704/904 Seps Eq 702/902", lat: -15.802449786329907, lon: -47.89940310012991, status: "ATIVO" },
+            "2": { nome: "AVIVA CEMSO", endereco: "Mod D - Asa Sul", lat: -15.815634955806981, lon: -47.91962608473196, status: "ATIVO" },
+            "3": { nome: "UNAI", endereco: "Colégio Militar de Brasília - 902/904 Asa Norte", lat: -15.779456881651777, lon: -47.89300, status: "ACOMPANHADO" },
+            "4": { nome: "Andamento", endereco: "SPO, SHCS - Plano Piloto", lat: -15.833929894133584, lon: -47.9391698422606, status: "ACOMPANHADO" },
+            "5": { nome: "NVC", endereco: "Plano Piloto (64MH+M4)", lat: -15.763914498737428, lon: -47.87207721349224, status: "ACOMPANHADO" },
+            "6": { nome: "Vinde", endereco: "Ceilândia (5V4X+99)", lat: -15.843889802538921, lon: -48.1016329911501, status: "ATIVO" }
+        };
+
+        // Lógica para mostrar/esconder a caixa de novo cadastro
+        document.getElementById('celula-id').addEventListener('change', function(e) {
+            const caixaNovo = document.getElementById('campos-novo');
+            if (e.target.value === 'novo') {
+                caixaNovo.style.display = 'block';
+                // Deixa os campos obrigatórios se for um novo
+                document.getElementById('novo-nome').required = true;
+                document.getElementById('novo-lat').required = true;
+                document.getElementById('novo-lon').required = true;
+            } else {
+                caixaNovo.style.display = 'none';
+                document.getElementById('novo-nome').required = false;
+                document.getElementById('novo-lat').required = false;
+                document.getElementById('novo-lon').required = false;
+            }
+        });
+
+        document.getElementById('form-celula').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            
+            const idSelecionado = document.getElementById('celula-id').value;
+            let dadosParaSalvar = {};
+
+            // VERIFICA SE É UM NOVO OU UMA ATUALIZAÇÃO DOS BASE
+            if (idSelecionado === 'novo') {
+                dadosParaSalvar = {
+                    nome: document.getElementById('novo-nome').value,
+                    endereco: document.getElementById('novo-endereco').value,
+                    // O parseFloat transforma o texto digitado em número decimal (exigido pelo banco)
+                    lat: parseFloat(document.getElementById('novo-lat').value.replace(',', '.')),
+                    lon: parseFloat(document.getElementById('novo-lon').value.replace(',', '.')),
+                    status: document.getElementById('novo-status').value,
+                    telefone: document.getElementById('telefone').value,
+                    instagram: document.getElementById('instagram').value,
+                    diaFuncionamento: document.getElementById('dia').value,
+                    horario: document.getElementById('horario').value
+                };
+            } else {
+                const infoBase = dadosBase[idSelecionado];
+                dadosParaSalvar = {
+                    nome: infoBase.nome,
+                    endereco: infoBase.endereco,
+                    lat: infoBase.lat,
+                    lon: infoBase.lon,
+                    status: infoBase.status,
+                    telefone: document.getElementById('telefone').value,
+                    instagram: document.getElementById('instagram').value,
+                    diaFuncionamento: document.getElementById('dia').value,
+                    horario: document.getElementById('horario').value
+                };
+            }
+
+            try {
+                const resposta = await fetch('http://localhost:8080/api/celulas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosParaSalvar)
+                });
+
+                if (resposta.ok) {
+                    alert('✅ Clubinho salvo com sucesso no Banco de Dados!');
+                    document.getElementById('form-celula').reset(); 
+                    document.getElementById('campos-novo').style.display = 'none'; // Esconde a caixa dnv
+                } else {
+                    alert('❌ Erro ao salvar. Verifique se digitou os dados corretamente.');
+                }
+            } catch (erro) {
+                console.error("Erro na requisição:", erro);
+                alert('🔌 Erro de conexão! O servidor Java está rodando?');
+            }
+        });
+    </script>
+</body>
+</html>
