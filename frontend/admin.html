@@ -196,6 +196,12 @@
             document.getElementById('celula-id').value = 'novo';
             atualizarCamposNovo();
             await carregarCelulasNoSelect();
+
+            // força o browser a atualizar os campos do formulário
+            document.getElementById('telefone').value = '';
+            document.getElementById('instagram').value = '';
+            document.getElementById('dia').value = '';
+            document.getElementById('horario').value = '';
         } catch (err) {
             alert('🔌 Erro de conexão ao excluir.');
         }
