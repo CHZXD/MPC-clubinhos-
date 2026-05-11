@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa de Células Cristãs - Escolas</title>
     
-    <!-- CSS do Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
@@ -25,7 +24,7 @@
         .popup-container {
             font-family: Arial, sans-serif;
             text-align: center;
-            min-width: 180px; /* Garante um tamanho mínimo legal para o card */
+            min-width: 180px;
         }
         
         .popup-title {
@@ -42,7 +41,6 @@
             margin-bottom: 8px;
         }
 
-        /* Novo estilo para a caixinha de detalhes (Contato e Horário) */
         .popup-details {
             background-color: #f9f9f9;
             border: 1px solid #eee;
@@ -69,25 +67,28 @@
 
     <div id="map"></div>
 
-    <!-- JS do Leaflet -->
+    <a href="admin.html" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: #007bff; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        ➕ Cadastrar Novo Clubinho
+    </a>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
         // 1. INICIALIZANDO O MAPA
         const map = L.map('map').setView([-15.793889, -47.950000], 11);
 
-        // 2. ADICIONANDO A CAMADA DE MAPA DO OPENSTREETMAP
+        // 2. CAMADA DO MAPA
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // 3. CONFIGURAÇÃO DE STATUS E CORES
+        // 3. CONFIGURAÇÃO DE CORES
         const statusConfig = {
-            'ATIVO': '#28a745',          // Verde
-            'ACOMPANHADO': '#007bff',    // Azul
-            'DESATIVADO': '#dc3545',     // Vermelho
-            'SEM INFORMAÇÕES': '#6c757d' // Cinza
+            'ATIVO': '#28a745',
+            'ACOMPANHADO': '#007bff',
+            'DESATIVADO': '#dc3545',
+            'SEM INFORMAÇÕES': '#6c757d'
         };
 
         function gerarIconeCustomizado(status) {
@@ -103,86 +104,47 @@
             });
         }
 
-        // 4. LISTA DE CÉLULAS (Simulando o que virá do Banco de Dados)
-        const celulasEscolares = [
-            { 
-                nome: "FIRE", 
-                endereco: "704/904 Seps Eq 702/902", 
-                lat: -15.802449786329907, lon: -47.89940310012991, 
-                status: "ATIVO",
-                // Novos campos adicionados para teste:
-                telefone: "(61) 99999-1111",
-                instagram: "@fire.seps",
-                dia_funcionamento: "Sexta-feira",
-                horario: "19:30"
-            },
-            { 
-                nome: "AVIVA CEMSO", 
-                endereco: "Mod D - Asa Sul", 
-                lat: -15.815634955806981, lon: -47.91962608473196, 
-                status: "ATIVO",
-                telefone: "(61) 98888-2222",
-                instagram: "@aviva.cemso",
-                dia_funcionamento: "Sábado",
-                horario: "16:00"
-            },
-            { 
-                nome: "UNAI", 
-                endereco: "Colégio Militar de Brasília - 902/904 Asa Norte", 
-                lat: -15.779456881651777, lon: -47.89300, 
-                status: "ACOMPANHADO" 
-                // Exemplo sem os dados novos: o popup vai mostrar "Não informado"
-            },
-            { 
-                nome: "Andamento", 
-                endereco: "SPO, SHCS - Plano Piloto", 
-                lat:-15.833929894133584, lon: -47.9391698422606,
-                status: "ACOMPANHADO" 
-            },
-            { 
-                nome: "NVC", 
-                endereco: "Plano Piloto (64MH+M4)", 
-                lat:  -15.763914498737428, lon:  -47.87207721349224,
-                status: "ACOMPANHADO" 
-            },
-            { 
-                nome: "Vinde", 
-                endereco: "Ceilândia (5V4X+99)", 
-                lat: -15.843889802538921, lon: -48.1016329911501,
-                status: "ATIVO" 
-            }
-        ];
+        // 4. FUNÇÃO PARA CARREGAR DADOS REAIS DA API
+        async function carregarDadosDoBanco() {
+            try {
+                const resposta = await fetch('https://mapa-celulas-v2.onrender.com/api/celulas');
+                const celulas = await resposta.json();
 
-        // 5. RENDERIZANDO OS MARCADORES NO MAPA
-        celulasEscolares.forEach(celula => {
-            const corBadge = statusConfig[celula.status] || statusConfig['SEM INFORMAÇÕES'];
-            
-            // Usamos o operador || 'Não informado' para caso a célula ainda não tenha esse dado cadastrado
-            const conteudoPopup = `
-                <div class="popup-container">
-                    <h3 class="popup-title">${celula.nome}</h3>
-                    <div class="popup-address">${celula.endereco}</div>
+                celulas.forEach(celula => {
+                    const corBadge = statusConfig[celula.status] || statusConfig['SEM INFORMAÇÕES'];
                     
-                    <div class="popup-details">
-                        <p><strong>📞 Tel:</strong> ${celula.telefone || 'Não informado'}</p>
-                        <p><strong>📸 Insta:</strong> ${celula.instagram || 'Não informado'}</p>
-                        <p><strong>📅 Dia:</strong> ${celula.dia_funcionamento || 'Não informado'}</p>
-                        <p><strong>⏰ Hora:</strong> ${celula.horario || 'Não informado'}</p>
-                    </div>
+                    const conteudoPopup = `
+                        <div class="popup-container">
+                            <h3 class="popup-title">${celula.nome}</h3>
+                            <div class="popup-address">${celula.endereco}</div>
+                            
+                            <div class="popup-details">
+                                <p><strong>📞 Tel:</strong> ${celula.telefone || 'Não informado'}</p>
+                                <p><strong>📸 Insta:</strong> ${celula.instagram || 'Não informado'}</p>
+                                <p><strong>📅 Dia:</strong> ${celula.diaFuncionamento || 'Não informado'}</p>
+                                <p><strong>⏰ Hora:</strong> ${celula.horario || 'Não informado'}</p>
+                            </div>
 
-                    <span class="status-badge" style="background-color: ${corBadge};">
-                        ${celula.status}
-                    </span>
-                </div>
-            `;
+                            <span class="status-badge" style="background-color: ${corBadge};">
+                                ${celula.status}
+                            </span>
+                        </div>
+                    `;
 
-            L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
-                .addTo(map)
-                .bindPopup(conteudoPopup);
-        });
+                    // Verifica se lat e lon existem antes de desenhar
+                    if (celula.lat && celula.lon) {
+                        L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
+                            .addTo(map)
+                            .bindPopup(conteudoPopup);
+                    }
+                });
+            } catch (erro) {
+                console.error("Erro ao carregar clubinhos:", erro);
+            }
+        }
+
+        // Executa a função ao abrir a página
+        carregarDadosDoBanco();
     </script>
 </body>
-<a href="admin.html" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: #007bff; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    ➕ Cadastrar Novo Clubinho
-</a>
 </html>
