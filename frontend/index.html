@@ -5,175 +5,211 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mapa de Células Cristãs - Escolas</title>
 
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
 
     <style>
-      body,
-      html {
+      body, html {
         margin: 0;
         padding: 0;
         height: 100%;
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
       }
       #map {
         height: 100vh;
         width: 100%;
       }
 
-      .status-badge {
-        padding: 4px 8px;
-        border-radius: 4px;
-        color: white;
-        font-weight: bold;
-        font-size: 12px;
-        display: inline-block;
-        margin-top: 8px;
+      /* Estilização dos Botões Flutuantes */
+      .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
+      .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #ffffff;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Customização do Popup do Leaflet */
+      .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      }
+      
       .popup-container {
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         text-align: center;
-        min-width: 180px;
+        min-width: 200px;
       }
 
       .popup-title {
         margin: 0;
-        font-size: 15px;
-        color: #333;
-        font-weight: bold;
+        font-size: 16px;
+        color: #1e293b;
+        font-weight: 700;
       }
 
       .popup-address {
-        font-size: 11px;
-        color: #666;
+        font-size: 12px;
+        color: #64748b;
         margin-top: 4px;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
       }
 
       .popup-details {
-        background-color: #f9f9f9;
-        border: 1px solid #eee;
-        border-radius: 6px;
-        padding: 8px;
+        background-color: #f1f5f9;
+        border-radius: 8px;
+        padding: 12px;
         text-align: left;
-        font-size: 12px;
-        color: #444;
-        margin-bottom: 10px;
+        font-size: 13px;
+        color: #334155;
+        margin-bottom: 12px;
       }
 
-      .popup-details p {
-        margin: 4px 0;
-        display: flex;
-        align-items: center;
-      }
+      .popup-details p { margin: 6px 0; display: flex; align-items: center; }
+      .popup-details strong { margin-right: 6px; color: #0f172a; }
 
-      .popup-details strong {
-        margin-right: 5px;
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        display: inline-block;
+        letter-spacing: 0.5px;
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
 
-    <a
-      href="admin.html"
-      style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        background: #007bff;
-        color: white;
-        padding: 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      "
-    >
-      ➕ Cadastrar Novo Clubinho
-    </a>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 12px; flex-direction: column;">
+      <button id="btn-atualizar" class="action-btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Atualizar Mapa
+      </button>
+      <a href="admin.html" class="action-btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Cadastrar Novo
+      </a>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
     <script>
-      // 1. INICIALIZANDO O MAPA
-      const map = L.map("map").setView([-15.793889, -47.95], 11);
+      const map = L.map("map", { zoomControl: false }).setView([-15.793889, -47.95], 11);
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // 2. CAMADA DO MAPA
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      // 3. CONFIGURAÇÃO DE CORES
       const statusConfig = {
-        ATIVO: "#28a745",
-        ACOMPANHADO: "#007bff",
-        DESATIVADO: "#dc3545",
-        "SEM INFORMAÇÕES": "#6c757d",
+        ATIVO: "#10b981",
+        ACOMPANHADO: "#3b82f6",
+        DESATIVADO: "#ef4444",
+        "SEM INFORMAÇÕES": "#94a3b8",
       };
+
+      let marcadores = [];
 
       function gerarIconeCustomizado(status) {
         const cor = statusConfig[status] || statusConfig["SEM INFORMAÇÕES"];
         return L.divIcon({
           className: "custom-marker",
-          html: `<svg width="28" height="42" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 0C5.373 0 0 5.373 0 12c0 8.25 12 24 12 24s12-15.75 12-24C24 5.373 18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="${cor}" stroke="#ffffff" stroke-width="2"/>
-                       </svg>`,
-          iconSize: [28, 42],
-          iconAnchor: [14, 42],
+          html: `<svg width="32" height="46" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 8.25 12 24 12 24s12-15.75 12-24C24 5.373 18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="${cor}" stroke="#ffffff" stroke-width="2" style="filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.25));"/>
+                 </svg>`,
+          iconSize: [32, 46],
+          iconAnchor: [16, 46],
           popupAnchor: [0, -42],
         });
       }
 
-      // 4. FUNÇÃO PARA CARREGAR DADOS REAIS DA API
+      function limparMarcadores() {
+        marcadores.forEach((marcador) => map.removeLayer(marcador));
+        marcadores = [];
+      }
+
       async function carregarDadosDoBanco() {
         try {
-          const resposta = await fetch(
-            "https://mapa-celulas-v2.onrender.com/api/celulas",
-          );
+          limparMarcadores();
+          
+          // Alterado para Localhost 8080 para os testes
+          const resposta = await fetch("https://mapa-celulas-v2.onrender.com/api/celulas");
           const celulas = await resposta.json();
 
           celulas.forEach((celula) => {
-            const corBadge =
-              statusConfig[celula.status] || statusConfig["SEM INFORMAÇÕES"];
+            const corBadge = statusConfig[celula.status] || statusConfig["SEM INFORMAÇÕES"];
+
+            let htmlHorarios = '';
+            if (celula.horarios && celula.horarios.trim() !== '') {
+                const lista = celula.horarios.split(';').map(item => {
+                    const partes = item.split('|');
+                    if (partes.length === 2) return `<li style="margin-bottom: 4px;">${partes[0]} às ${partes[1]}</li>`;
+                    return '';
+                }).join('');
+                htmlHorarios = `<div style="margin-top: 8px;"><strong>Horários:</strong><ul style="margin: 6px 0 4px 22px; padding: 0;">${lista}</ul></div>`;
+            } else if (celula.diaFuncionamento && celula.horario) {
+                htmlHorarios = `<p><strong>Dia:</strong> ${celula.diaFuncionamento}</p><p><strong>Hora:</strong> ${celula.horario}</p>`;
+            } else {
+                htmlHorarios = `<p><strong>Horários:</strong> Não informado</p>`;
+            }
 
             const conteudoPopup = `
-                        <div class="popup-container">
-                            <h3 class="popup-title">${celula.nome}</h3>
-                            <div class="popup-address">${celula.endereco}</div>
-                            
-                            <div class="popup-details">
-                                <p><strong>📞 Tel:</strong> ${celula.telefone || "Não informado"}</p>
-                                <p><strong>📸 Insta:</strong> ${celula.instagram || "Não informado"}</p>
-                                <p><strong>📅 Dia:</strong> ${celula.diaFuncionamento || "Não informado"}</p>
-                                <p><strong>⏰ Hora:</strong> ${celula.horario || "Não informado"}</p>
-                            </div>
+                <div class="popup-container">
+                    <h3 class="popup-title">${celula.nome}</h3>
+                    <div class="popup-address">${celula.endereco}</div>
+                    <div class="popup-details">
+                        <p><strong>📞 Tel:</strong> ${celula.telefone || "Não informado"}</p>
+                        <p><strong>📸 Insta:</strong> ${celula.instagram || "Não informado"}</p>
+                        ${htmlHorarios}
+                    </div>
+                    <span class="status-badge" style="background-color: ${corBadge};">${celula.status}</span>
+                </div>`;
 
-                            <span class="status-badge" style="background-color: ${corBadge};">
-                                ${celula.status}
-                            </span>
-                        </div>
-                    `;
-
-            // Verifica se lat e lon existem antes de desenhar
             if (celula.lat && celula.lon) {
-              L.marker([celula.lat, celula.lon], {
-                icon: gerarIconeCustomizado(celula.status),
-              })
+                const marcador = L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
                 .addTo(map)
                 .bindPopup(conteudoPopup);
+                marcadores.push(marcador);
             }
           });
-        } catch (erro) {
-          console.error("Erro ao carregar clubinhos:", erro);
+        } catch (error) {
+          console.error("Erro ao carregar clubinhos:", error);
         }
       }
 
-      // Executa a função ao abrir a página
+      document.getElementById("btn-atualizar").addEventListener("click", carregarDadosDoBanco);
       carregarDadosDoBanco();
     </script>
   </body>

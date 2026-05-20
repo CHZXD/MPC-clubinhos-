@@ -24,11 +24,16 @@ public class Celula {
     private String status;
     private String telefone;
     private String instagram;
+    // Campos antigos (mantidos para compatibilidade com o index.html)
     private String diaFuncionamento;
     private String horario;
 
+    // Novo: múltiplos dias/horários
+    private String horarios;
+
     // Construtor vazio (Obrigatório para o Spring Boot e o JPA funcionarem nos bastidores)
     public Celula() {
+        // JPA e Spring precisam de um construtor sem argumentos para desserializar
     }
 
     // --------------------------------------------------------
@@ -114,4 +119,13 @@ public class Celula {
     public void setHorario(String horario) {
         this.horario = horario;
     }
+
+    public String getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(String horarios) {
+        this.horarios = horarios;
+    }
+
 }

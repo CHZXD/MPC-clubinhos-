@@ -3,215 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel - CRUD Células</title>
+    <title>Painel - CRUD Clubinhos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 520px; margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; color: #333; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { margin-top: 16px; width: 100%; padding: 10px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; }
-        .btn-save { background-color: #007bff; color: white; }
-        .btn-save:hover { background-color: #0056b3; }
-        .btn-delete { background-color: #dc3545; color: white; }
-        .btn-delete:hover { filter: brightness(0.95); }
-
-        #campos-novo {
-            display: none;
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px dashed #6c757d;
-        }
-        #campos-novo label { margin-top: 10px; color: #0056b3; }
-        .hint { font-size: 13px; color: #333; margin-top: 6px; }
-        .row-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        body { font-family: 'Inter', sans-serif; padding: 40px 20px; background-color: #f1f5f9; color: #334155; }
+        .form-container { background: #ffffff; padding: 32px; border-radius: 16px; max-width: 550px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .header-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #3b82f6; font-weight: 600; font-size: 14px; transition: color 0.2s; }
+        .header-link:hover { color: #2563eb; }
+        h2 { margin-top: 16px; margin-bottom: 8px; color: #0f172a; font-size: 24px; font-weight: 700; }
+        .hint { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        .divider { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+        label { display: block; margin-top: 16px; font-weight: 600; font-size: 13px; color: #475569; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 14px; transition: all 0.2s; }
+        input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); background-color: #ffffff; }
+        button { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+        .btn-save { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3); }
+        .btn-secondary { background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-secondary:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+        .btn-delete { background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+        .btn-delete:hover { background-color: #fecaca; }
+        #campos-novo { display: none; background-color: #f8fafc; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px dashed #94a3b8; }
+        .warning-text { font-size: 12px; color: #ef4444; margin-top: 6px; font-weight: 500; }
+        .row-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;}
+        .horario-item { display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 10px; }
+        .horario-text { font-weight: 600; color: #0f172a; font-size: 14px; }
+        .btn-remove-horario { margin: 0; width: auto; padding: 6px 12px; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: bold;">
-        ⬅️ Voltar para o Mapa
+    <a href="index.html" class="header-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar para o Mapa
     </a>
 
-    <h2 style="margin-top: 10px;">CRUD de Clubinhos</h2>
+    <h2>Gestão de Clubinhos</h2>
+    <div class="hint">Gerencie os locais e horários das células de forma rápida.</div>
 
-    <div class="hint">
-        • <b>Modificar</b>: selecione a célula (id do banco) e clique em <i>Salvar</i><br>
-        • <b>Excluir</b>: selecione a célula (id do banco) e clique em <i>Excluir</i>
-    </div>
-
-    <hr style="border:none;border-top:1px solid #ddd; margin:16px 0;" />
-
-    <label>Selecione a Célula (id do banco):</label>
+    <label for="celula-id">Selecione o Clubinho:</label>
     <select id="celula-id" required>
-        <option value="novo" style="font-weight: bold; color: blue;">➕ CADASTRAR NOVO CLUBINHO</option>
+        <option value="novo" style="font-weight: bold; color: #2563eb;">Novo Cadastro</option>
     </select>
 
     <div class="row-actions">
-        <button id="btn-excluir" type="button" class="btn-delete">Excluir selecionado</button>
-        <button type="submit" class="btn-save" form="form-celula" style="margin-top: 16px;">Salvar no Banco de Dados</button>
+        <button id="btn-excluir" type="button" class="btn-delete">Excluir</button>
+        <button type="submit" class="btn-save" form="form-celula">Salvar Tudo</button>
     </div>
+
+    <hr class="divider" />
 
     <form id="form-celula">
         <div id="campos-novo">
-            <label>Nome do Novo Clubinho:</label>
+            <label for="novo-nome">Nome do Clubinho</label>
             <input type="text" id="novo-nome" placeholder="Ex: Clubinho Taguatinga" />
-
-            <label>Endereço / Referência:</label>
+            <label for="novo-endereco">Endereço / Referência</label>
             <input type="text" id="novo-endereco" placeholder="Ex: QNB 12, Casa 5" />
-
-            <label>Latitude (Lat):</label>
+            <label for="novo-lat">Latitude</label>
             <input type="text" id="novo-lat" placeholder="Ex: -15.8339" />
-
-            <label>Longitude (Lon):</label>
+            <div class="warning-text">⚠️ Use negativo (ex: -15.8)</div>
+            <label for="novo-lon">Longitude</label>
             <input type="text" id="novo-lon" placeholder="Ex: -47.9391" />
-
-            <label>Status Inicial:</label>
+            <div class="warning-text">⚠️ Use negativo (ex: -47.9)</div>
+            <label for="novo-status">Status Inicial</label>
             <select id="novo-status">
-                <option value="ATIVO">ATIVO</option>
-                <option value="ACOMPANHADO">ACOMPANHADO</option>
-                <option value="SEM INFORMAÇÕES">SEM INFORMAÇÕES</option>
-                <option value="DESATIVADO">DESATIVADO</option>
+                <option value="ATIVO">Ativo</option>
+                <option value="ACOMPANHADO">Acompanhado</option>
+                <option value="SEM INFORMAÇÕES">Sem Informações</option>
+                <option value="DESATIVADO">Desativado</option>
             </select>
+        </div>
 
-            <div style="font-size: 13px; color:#333; margin-top: 10px;">
-                Atenção: para excluir/modificar clubinhos existentes, selecione a célula pelo <b>id do banco</b>.
+        <label for="telefone">Telefone (WhatsApp)</label>
+        <input type="tel" id="telefone" placeholder="(61) 90000-0000" required />
+        <label for="instagram">Instagram</label>
+        <input type="text" id="instagram" placeholder="@seu.clubinho" required />
+
+        <hr class="divider" />
+        <h3 style="font-size: 15px; margin: 0; color: #0f172a; font-weight: 700;">Horários</h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+                <label for="dia-funcionamento">Dia</label>
+                <select id="dia-funcionamento">
+                    <option value="" selected>Escolha...</option>
+                    <option value="Segunda">Segunda</option>
+                    <option value="Terça">Terça</option>
+                    <option value="Quarta">Quarta</option>
+                    <option value="Quinta">Quinta</option>
+                    <option value="Sexta">Sexta</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                </select>
+            </div>
+            <div>
+                <label for="horario-unico">Horário</label>
+                <input type="time" id="horario-unico" />
             </div>
         </div>
 
-        <label>Telefone (WhatsApp):</label>
-        <input type="tel" id="telefone" placeholder="(61) 90000-0000" required />
-
-        <label>Instagram:</label>
-        <input type="text" id="instagram" placeholder="@seu.clubinho" required />
-
-        <label>Adicionar um Horário</label>
-
-        <label>Dia da Semana:</label>
-        <select id="dia-funcionamento">
-            <option value="" selected>Selecione o dia</option>
-            <option value="Segunda">Segunda</option>
-            <option value="Terça">Terça</option>
-            <option value="Quarta">Quarta</option>
-            <option value="Quinta">Quinta</option>
-            <option value="Sexta">Sexta</option>
-            <option value="Sábado">Sábado</option>
-            <option value="Domingo">Domingo</option>
-        </select>
-
-        <label>Horário:</label>
-        <input type="time" id="horario-unico" />
-
-        <button type="button" id="btn-adicionar-horario" class="btn-save" style="margin-top:16px;">
+        <button type="button" id="btn-adicionar-horario" class="btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
             Adicionar Horário
         </button>
 
-        <div id="lista-horarios" style="margin-top:14px;"></div>
-
-        <div class="hint" style="margin-top:10px;">
-            Os itens serão enviados no campo <b>horarios</b> como array de objetos.
-        </div>
+        <div id="lista-horarios"></div>
     </form>
 </div>
 
 <script>
-    const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas';
-
-    // Mantido por compatibilidade com seu fluxo atual de PUT (1..6).
-    const dadosBase = {
-        "1": { nome: "FIRE", endereco: "704/904 Seps Eq 702/902", lat: -15.802449786329907, lon: -47.89940310012991, status: "ATIVO" },
-        "2": { nome: "AVIVA CEMSO", endereco: "Mod D - Asa Sul", lat: -15.815634955806981, lon: -47.91962608473196, status: "ATIVO" },
-        "3": { nome: "UNAI", endereco: "Colégio Militar de Brasília - 902/904 Asa Norte", lat: -15.779456881651777, lon: -47.89300, status: "ACOMPANHADO" },
-        "4": { nome: "Andamento", endereco: "SPO, SHCS - Plano Piloto", lat: -15.833929894133584, lon: -47.9391698422606, status: "ACOMPANHADO" },
-        "5": { nome: "NVC", endereco: "Plano Piloto (64MH+M4)", lat: -15.763914498737428, lon: -47.87207721349224, status: "ACOMPANHADO" },
-        "6": { nome: "Vinde", endereco: "Ceilândia (5V4X+99)", lat: -15.843889802538921, lon: -48.1016329911501, status: "ATIVO" }
-    };
-
+    const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas'; // LOCALHOST ATIVO
     const stateHorarios = [];
 
     function atualizarCamposNovo() {
         const caixaNovo = document.getElementById('campos-novo');
         const isNovo = document.getElementById('celula-id').value === 'novo';
         caixaNovo.style.display = isNovo ? 'block' : 'none';
-
         document.getElementById('novo-nome').required = isNovo;
         document.getElementById('novo-lat').required = isNovo;
         document.getElementById('novo-lon').required = isNovo;
         document.getElementById('novo-endereco').required = isNovo;
     }
 
-    function clearListaHorarios() {
-        document.getElementById('lista-horarios').innerHTML = '';
-    }
-
     function renderListaHorarios() {
-        clearListaHorarios();
-
+        const lista = document.getElementById('lista-horarios');
+        lista.innerHTML = '';
+        if (stateHorarios.length === 0) {
+            lista.innerHTML = '<div style="font-size: 13px; color: #94a3b8; text-align: center; margin-top:15px;">Nenhum horário definido.</div>';
+            return;
+        }
         stateHorarios.forEach((item, idx) => {
-            const dia = item?.dia || '';
-            const horario = item?.horario || '';
-
             const row = document.createElement('div');
-            row.style.display = 'flex';
-            row.style.alignItems = 'center';
-            row.style.justifyContent = 'space-between';
-            row.style.gap = '10px';
-            row.style.background = '#fff';
-            row.style.border = '1px solid #ccc';
-            row.style.borderRadius = '8px';
-            row.style.padding = '10px';
-            row.style.marginTop = '8px';
-
-            const text = document.createElement('div');
-            text.style.fontWeight = 'bold';
-            text.textContent = `${dia} - ${horario}`;
-
+            row.className = 'horario-item';
+            row.innerHTML = `<span class="horario-text">${item.dia} às ${item.horario}</span>`;
             const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.textContent = 'Remover';
-            btn.className = 'btn-delete';
-            btn.style.width = 'auto';
-            btn.style.padding = '8px 12px';
-
-            btn.addEventListener('click', () => {
-                stateHorarios.splice(idx, 1);
-                renderListaHorarios();
-            });
-
-            row.appendChild(text);
+            btn.type = 'button'; btn.textContent = 'Remover'; btn.className = 'btn-delete btn-remove-horario';
+            btn.onclick = () => { stateHorarios.splice(idx, 1); renderListaHorarios(); };
             row.appendChild(btn);
-            document.getElementById('lista-horarios').appendChild(row);
+            lista.appendChild(row);
         });
-    }
-
-    function resetAdicionarCampos() {
-        document.getElementById('dia-funcionamento').value = '';
-        document.getElementById('horario-unico').value = '';
-        document.getElementById('dia-funcionamento').focus();
     }
 
     async function carregarCelulasNoSelect() {
         const select = document.getElementById('celula-id');
         const valorAtual = select.value;
-
         const resposta = await fetch(API_BASE);
         const celulas = await resposta.json();
-
-        select.innerHTML = '<option value="novo" style="font-weight: bold; color: blue;">➕ CADASTRAR NOVO CLUBINHO</option>';
-
+        select.innerHTML = '<option value="novo" style="font-weight: bold; color: #2563eb;">Novo Cadastro</option>';
         celulas.forEach(c => {
             const opt = document.createElement('option');
             opt.value = String(c.id);
-            const nome = c.nome ? c.nome : 'Sem nome';
-            opt.textContent = `${c.id} - ${nome}`;
+            opt.textContent = `${c.nome || 'Sem nome'} (ID: ${c.id})`;
             select.appendChild(opt);
         });
-
-        const existe = Array.from(select.options).some(o => o.value === valorAtual);
-        if (existe) select.value = valorAtual;
-
+        if (Array.from(select.options).some(o => o.value === valorAtual)) select.value = valorAtual;
         atualizarCamposNovo();
         await carregarDadosSelecionadosNoForm();
     }
@@ -219,182 +169,61 @@
     async function carregarDadosSelecionadosNoForm() {
         const idSelecionado = document.getElementById('celula-id').value;
         if (idSelecionado === 'novo') return;
-
         try {
             const resposta = await fetch(`${API_BASE}/${idSelecionado}`);
             if (!resposta.ok) return;
-
             const c = await resposta.json();
-
             document.getElementById('telefone').value = c.telefone || '';
             document.getElementById('instagram').value = c.instagram || '';
-
             stateHorarios.length = 0;
-            if (Array.isArray(c.horarios)) {
-                c.horarios.forEach(x => {
-                    if (x && x.dia && x.horario) stateHorarios.push({ dia: x.dia, horario: x.horario });
+            if (c.horarios && typeof c.horarios === 'string') {
+                c.horarios.split(';').forEach(item => {
+                    const parts = item.split('|');
+                    if (parts.length === 2) stateHorarios.push({ dia: parts[0], horario: parts[1] });
                 });
             }
-
             renderListaHorarios();
-        } catch (e) {
-            // fallback: nada
-        }
+        } catch (e) { console.error(e); }
     }
-
-    async function excluirSelecionado() {
-        const idSelecionado = document.getElementById('celula-id').value;
-        if (idSelecionado === 'novo') {
-            alert('Selecione uma célula existente para excluir.');
-            return;
-        }
-
-        const ok = confirm(`Excluir a célula id ${idSelecionado}?`);
-        if (!ok) return;
-
-        try {
-            const resp = await fetch(`${API_BASE}/${idSelecionado}`, { method: 'DELETE' });
-            if (!resp.ok) {
-                const text = await resp.text().catch(() => '');
-                alert(`Erro ao excluir. ${text}`.trim());
-                return;
-            }
-
-            alert('✅ Exclusão realizada!');
-            document.getElementById('form-celula').reset();
-            document.getElementById('campos-novo').style.display = 'none';
-            document.getElementById('celula-id').value = 'novo';
-            atualizarCamposNovo();
-
-            stateHorarios.length = 0;
-            clearListaHorarios();
-
-            document.getElementById('telefone').value = '';
-            document.getElementById('instagram').value = '';
-
-            await carregarCelulasNoSelect();
-        } catch (err) {
-            alert('🔌 Erro de conexão ao excluir.');
-        }
-    }
-
-    document.getElementById('btn-excluir').addEventListener('click', excluirSelecionado);
 
     document.getElementById('btn-adicionar-horario').addEventListener('click', () => {
         const dia = document.getElementById('dia-funcionamento').value;
         const horario = document.getElementById('horario-unico').value;
-
-        if (!dia) {
-            alert('Selecione um dia da semana.');
-            return;
-        }
-        if (!horario) {
-            alert('Selecione um horário.');
-            return;
-        }
-
+        if (!dia || !horario) { alert('Preencha o dia e o horário!'); return; }
         stateHorarios.push({ dia, horario });
         renderListaHorarios();
-        resetAdicionarCampos();
+        document.getElementById('horario-unico').value = '';
     });
 
-    document.getElementById('celula-id').addEventListener('change', async () => {
-        atualizarCamposNovo();
-        await carregarDadosSelecionadosNoForm();
-    });
+    document.getElementById('celula-id').addEventListener('change', carregarDadosSelecionadosNoForm);
 
     document.getElementById('form-celula').addEventListener('submit', async function (e) {
         e.preventDefault();
-
         const idSelecionado = document.getElementById('celula-id').value;
         const horariosArr = stateHorarios.map(x => ({ dia: x.dia, horario: x.horario }));
-
-        if (horariosArr.length === 0) {
-            alert('Adicione pelo menos 1 horário.');
-            return;
-        }
-
-        let payload = null;
-        let metodo = 'POST';
-        let url = API_BASE;
+        let payload = { telefone: document.getElementById('telefone').value, instagram: document.getElementById('instagram').value, horarios: horariosArr };
 
         if (idSelecionado === 'novo') {
-            const lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
-            const lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
-
-            if (Number.isNaN(lat) || Number.isNaN(lon)) {
-                alert('Por favor, informe latitude e longitude válidas.');
-                return;
-            }
-
-            payload = {
-                nome: document.getElementById('novo-nome').value,
-                endereco: document.getElementById('novo-endereco').value,
-                lat,
-                lon,
-                status: document.getElementById('novo-status').value,
-                telefone: document.getElementById('telefone').value,
-                instagram: document.getElementById('instagram').value,
-                horarios: horariosArr
-            };
+            payload.nome = document.getElementById('novo-nome').value;
+            payload.endereco = document.getElementById('novo-endereco').value;
+            payload.lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
+            payload.lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
+            payload.status = document.getElementById('novo-status').value;
         } else {
-            const infoBase = dadosBase[idSelecionado] || {
-                nome: '',
-                endereco: '',
-                lat: null,
-                lon: null,
-                status: 'SEM INFORMAÇÕES'
-            };
-
-            payload = {
-                nome: infoBase.nome,
-                endereco: infoBase.endereco,
-                lat: infoBase.lat,
-                lon: infoBase.lon,
-                status: infoBase.status,
-                telefone: document.getElementById('telefone').value,
-                instagram: document.getElementById('instagram').value,
-                horarios: horariosArr
-            };
-
-            metodo = 'PUT';
-            url = `${API_BASE}/${idSelecionado}`;
+            const resp = await fetch(`${API_BASE}/${idSelecionado}`);
+            const antigo = await resp.json();
+            payload = { ...antigo, ...payload };
         }
 
-        try {
-            const resposta = await fetch(url, {
-                method: metodo,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!resposta.ok) {
-                const text = await resposta.text().catch(() => '');
-                alert(`❌ Erro ao salvar. ${text}`.trim());
-                return;
-            }
-
-            alert('✅ Salvo com sucesso!');
-            document.getElementById('form-celula').reset();
-            document.getElementById('campos-novo').style.display = 'none';
-
-            stateHorarios.length = 0;
-            clearListaHorarios();
-
-            await carregarCelulasNoSelect();
-        } catch (erro) {
-            console.error(erro);
-            alert('🔌 Erro de conexão!');
-        }
+        const url = idSelecionado === 'novo' ? API_BASE : `${API_BASE}/${idSelecionado}`;
+        const metodo = idSelecionado === 'novo' ? 'POST' : 'PUT';
+        
+        await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        alert('✅ Salvo!');
+        window.location.href = 'index.html';
     });
 
-    window.addEventListener('DOMContentLoaded', async () => {
-        atualizarCamposNovo();
-        await carregarCelulasNoSelect();
-        stateHorarios.length = 0;
-        clearListaHorarios();
-    });
+    window.addEventListener('DOMContentLoaded', carregarCelulasNoSelect);
 </script>
 </body>
 </html>
-
