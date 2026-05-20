@@ -7,16 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; padding: 40px 20px; background-color: #f1f5f9; color: #334155; }
-        .form-container { background: #ffffff; padding: 32px; border-radius: 16px; max-width: 550px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .form-container { background: #ffffff; padding: 32px; border-radius: 16px; max-width: 550px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01); }
         .header-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #3b82f6; font-weight: 600; font-size: 14px; transition: color 0.2s; }
         .header-link:hover { color: #2563eb; }
         h2 { margin-top: 16px; margin-bottom: 8px; color: #0f172a; font-size: 24px; font-weight: 700; }
         .hint { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
         .divider { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
         label { display: block; margin-top: 16px; font-weight: 600; font-size: 13px; color: #475569; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 14px; transition: all 0.2s; }
+        input, select { width: 100%; padding: 12px 14px; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 14px; color: #1e293b; transition: all 0.2s; }
         input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); background-color: #ffffff; }
-        button { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+        button { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
         .btn-save { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
         .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3); }
         .btn-secondary { background-color: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
@@ -26,7 +26,7 @@
         #campos-novo { display: none; background-color: #f8fafc; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px dashed #94a3b8; }
         .warning-text { font-size: 12px; color: #ef4444; margin-top: 6px; font-weight: 500; }
         .row-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;}
-        .horario-item { display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 10px; }
+        .horario-item { display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .horario-text { font-weight: 600; color: #0f172a; font-size: 14px; }
         .btn-remove-horario { margin: 0; width: auto; padding: 6px 12px; font-size: 12px; }
     </style>
@@ -49,7 +49,7 @@
 
     <div class="row-actions">
         <button id="btn-excluir" type="button" class="btn-delete">Excluir</button>
-        <button type="submit" class="btn-save" form="form-celula">Salvar Tudo</button>
+        <button type="submit" class="btn-save" form="form-celula" style="margin-top: 0;">Salvar Tudo</button>
     </div>
 
     <hr class="divider" />
@@ -112,12 +112,12 @@
             Adicionar Horário
         </button>
 
-        <div id="lista-horarios"></div>
+        <div id="lista-horarios" style="margin-top:20px;"></div>
     </form>
 </div>
 
 <script>
-    const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas'; // LOCALHOST ATIVO
+    const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas'; 
     const stateHorarios = [];
 
     function atualizarCamposNovo() {
@@ -134,7 +134,7 @@
         const lista = document.getElementById('lista-horarios');
         lista.innerHTML = '';
         if (stateHorarios.length === 0) {
-            lista.innerHTML = '<div style="font-size: 13px; color: #94a3b8; text-align: center; margin-top:15px;">Nenhum horário definido.</div>';
+            lista.innerHTML = '<div style="font-size: 13px; color: #94a3b8; text-align: center;">Nenhum horário definido.</div>';
             return;
         }
         stateHorarios.forEach((item, idx) => {
@@ -152,8 +152,11 @@
     async function carregarCelulasNoSelect() {
         const select = document.getElementById('celula-id');
         const valorAtual = select.value;
-        const resposta = await fetch(API_BASE);
+        
+        // Bloqueio de cache forçado para buscar sempre a lista atualizada
+        const resposta = await fetch(API_BASE, { cache: 'no-store' });
         const celulas = await resposta.json();
+        
         select.innerHTML = '<option value="novo" style="font-weight: bold; color: #2563eb;">Novo Cadastro</option>';
         celulas.forEach(c => {
             const opt = document.createElement('option');
@@ -161,6 +164,7 @@
             opt.textContent = `${c.nome || 'Sem nome'} (ID: ${c.id})`;
             select.appendChild(opt);
         });
+        
         if (Array.from(select.options).some(o => o.value === valorAtual)) select.value = valorAtual;
         atualizarCamposNovo();
         await carregarDadosSelecionadosNoForm();
@@ -170,7 +174,8 @@
         const idSelecionado = document.getElementById('celula-id').value;
         if (idSelecionado === 'novo') return;
         try {
-            const resposta = await fetch(`${API_BASE}/${idSelecionado}`);
+            // Anti-cache aqui também
+            const resposta = await fetch(`${API_BASE}/${idSelecionado}`, { cache: 'no-store' });
             if (!resposta.ok) return;
             const c = await resposta.json();
             document.getElementById('telefone').value = c.telefone || '';
@@ -197,6 +202,39 @@
 
     document.getElementById('celula-id').addEventListener('change', carregarDadosSelecionadosNoForm);
 
+    // FUNÇÃO EXCLUIR ATUALIZADA (Tratamento de Erros Ocultos + Reset completo)
+    document.getElementById('btn-excluir').addEventListener('click', async () => {
+        const idSelecionado = document.getElementById('celula-id').value;
+        if (idSelecionado === 'novo') { alert('Selecione uma célula existente para excluir.'); return; }
+        if (!confirm('Tem a certeza que deseja excluir este clubinho permanentemente?')) return;
+
+        try {
+            const resposta = await fetch(`${API_BASE}/${idSelecionado}`, { method: 'DELETE' });
+            
+            // Verificação rigorosa de erros
+            if (!resposta.ok) {
+                const erroServidor = await resposta.text();
+                throw new Error(erroServidor || 'O servidor recusou a exclusão.');
+            }
+            
+            alert('✅ Excluído com sucesso!');
+            
+            // Forçar o UI a voltar para o modo "Novo Cadastro" de imediato
+            document.getElementById('form-celula').reset();
+            document.getElementById('celula-id').value = 'novo';
+            stateHorarios.length = 0;
+            renderListaHorarios();
+            atualizarCamposNovo();
+            
+            // Recarregar Select pedindo dados frescos à API
+            await carregarCelulasNoSelect();
+            
+        } catch (err) { 
+            console.error(err);
+            alert('Erro ao excluir: ' + err.message); 
+        }
+    });
+
     document.getElementById('form-celula').addEventListener('submit', async function (e) {
         e.preventDefault();
         const idSelecionado = document.getElementById('celula-id').value;
@@ -210,7 +248,7 @@
             payload.lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
             payload.status = document.getElementById('novo-status').value;
         } else {
-            const resp = await fetch(`${API_BASE}/${idSelecionado}`);
+            const resp = await fetch(`${API_BASE}/${idSelecionado}`, { cache: 'no-store' });
             const antigo = await resp.json();
             payload = { ...antigo, ...payload };
         }

@@ -197,11 +197,19 @@
                     <span class="status-badge" style="background-color: ${corBadge};">${celula.status}</span>
                 </div>`;
 
-            if (celula.lat && celula.lon) {
-                const marcador = L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
-                .addTo(map)
-                .bindPopup(conteudoPopup);
-                marcadores.push(marcador);
+            const latOk = celula.lat !== null && celula.lat !== undefined && celula.lat !== '';
+            const lonOk = celula.lon !== null && celula.lon !== undefined && celula.lon !== '';
+
+            if (latOk && lonOk) {
+                const lat = Number(celula.lat);
+                const lon = Number(celula.lon);
+
+                if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
+                    const marcador = L.marker([lat, lon], { icon: gerarIconeCustomizado(celula.status) })
+                    .addTo(map)
+                    .bindPopup(conteudoPopup);
+                    marcadores.push(marcador);
+                }
             }
           });
         } catch (error) {
