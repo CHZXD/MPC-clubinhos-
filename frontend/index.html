@@ -1,128 +1,156 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mapa de Células Cristãs - Escolas</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
-        #map { height: 100vh; width: 100%; }
-        
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-            margin-top: 8px;
-        }
-        
-        .popup-container {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            min-width: 180px;
-        }
-        
-        .popup-title {
-            margin: 0;
-            font-size: 15px;
-            color: #333;
-            font-weight: bold;
-        }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
 
-        .popup-address {
-            font-size: 11px;
-            color: #666;
-            margin-top: 4px;
-            margin-bottom: 8px;
-        }
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+        display: inline-block;
+        margin-top: 8px;
+      }
 
-        .popup-details {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            padding: 8px;
-            text-align: left;
-            font-size: 12px;
-            color: #444;
-            margin-bottom: 10px;
-        }
+      .popup-container {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        min-width: 180px;
+      }
 
-        .popup-details p {
-            margin: 4px 0;
-            display: flex;
-            align-items: center;
-        }
+      .popup-title {
+        margin: 0;
+        font-size: 15px;
+        color: #333;
+        font-weight: bold;
+      }
 
-        .popup-details strong {
-            margin-right: 5px;
-        }
+      .popup-address {
+        font-size: 11px;
+        color: #666;
+        margin-top: 4px;
+        margin-bottom: 8px;
+      }
+
+      .popup-details {
+        background-color: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 8px;
+        text-align: left;
+        font-size: 12px;
+        color: #444;
+        margin-bottom: 10px;
+      }
+
+      .popup-details p {
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .popup-details strong {
+        margin-right: 5px;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="map"></div>
 
-    <a href="admin.html" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: #007bff; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        ➕ Cadastrar Novo Clubinho
+    <a
+      href="admin.html"
+      style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: #007bff;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      "
+    >
+      ➕ Cadastrar Novo Clubinho
     </a>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <script>
-        // 1. INICIALIZANDO O MAPA
-        const map = L.map('map').setView([-15.793889, -47.950000], 11);
+      // 1. INICIALIZANDO O MAPA
+      const map = L.map("map").setView([-15.793889, -47.95], 11);
 
-        // 2. CAMADA DO MAPA
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+      // 2. CAMADA DO MAPA
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
 
-        // 3. CONFIGURAÇÃO DE CORES
-        const statusConfig = {
-            'ATIVO': '#28a745',
-            'ACOMPANHADO': '#007bff',
-            'DESATIVADO': '#dc3545',
-            'SEM INFORMAÇÕES': '#6c757d'
-        };
+      // 3. CONFIGURAÇÃO DE CORES
+      const statusConfig = {
+        ATIVO: "#28a745",
+        ACOMPANHADO: "#007bff",
+        DESATIVADO: "#dc3545",
+        "SEM INFORMAÇÕES": "#6c757d",
+      };
 
-        function gerarIconeCustomizado(status) {
-            const cor = statusConfig[status] || statusConfig['SEM INFORMAÇÕES'];
-            return L.divIcon({
-                className: 'custom-marker',
-                html: `<svg width="28" height="42" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+      function gerarIconeCustomizado(status) {
+        const cor = statusConfig[status] || statusConfig["SEM INFORMAÇÕES"];
+        return L.divIcon({
+          className: "custom-marker",
+          html: `<svg width="28" height="42" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 0C5.373 0 0 5.373 0 12c0 8.25 12 24 12 24s12-15.75 12-24C24 5.373 18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="${cor}" stroke="#ffffff" stroke-width="2"/>
                        </svg>`,
-                iconSize: [28, 42],
-                iconAnchor: [14, 42], 
-                popupAnchor: [0, -42] 
-            });
-        }
+          iconSize: [28, 42],
+          iconAnchor: [14, 42],
+          popupAnchor: [0, -42],
+        });
+      }
 
-        // 4. FUNÇÃO PARA CARREGAR DADOS REAIS DA API
-        async function carregarDadosDoBanco() {
-            try {
-                const resposta = await fetch('https://mapa-celulas-v2.onrender.com/api/celulas');
-                const celulas = await resposta.json();
+      // 4. FUNÇÃO PARA CARREGAR DADOS REAIS DA API
+      async function carregarDadosDoBanco() {
+        try {
+          const resposta = await fetch(
+            "https://mapa-celulas-v2.onrender.com/api/celulas",
+          );
+          const celulas = await resposta.json();
 
-                celulas.forEach(celula => {
-                    const corBadge = statusConfig[celula.status] || statusConfig['SEM INFORMAÇÕES'];
-                    
-                    const conteudoPopup = `
+          celulas.forEach((celula) => {
+            const corBadge =
+              statusConfig[celula.status] || statusConfig["SEM INFORMAÇÕES"];
+
+            const conteudoPopup = `
                         <div class="popup-container">
                             <h3 class="popup-title">${celula.nome}</h3>
                             <div class="popup-address">${celula.endereco}</div>
                             
                             <div class="popup-details">
-                                <p><strong>📞 Tel:</strong> ${celula.telefone || 'Não informado'}</p>
-                                <p><strong>📸 Insta:</strong> ${celula.instagram || 'Não informado'}</p>
-                                <p><strong>📅 Dia:</strong> ${celula.diaFuncionamento || 'Não informado'}</p>
-                                <p><strong>⏰ Hora:</strong> ${celula.horario || 'Não informado'}</p>
+                                <p><strong>📞 Tel:</strong> ${celula.telefone || "Não informado"}</p>
+                                <p><strong>📸 Insta:</strong> ${celula.instagram || "Não informado"}</p>
+                                <p><strong>📅 Dia:</strong> ${celula.diaFuncionamento || "Não informado"}</p>
+                                <p><strong>⏰ Hora:</strong> ${celula.horario || "Não informado"}</p>
                             </div>
 
                             <span class="status-badge" style="background-color: ${corBadge};">
@@ -131,20 +159,22 @@
                         </div>
                     `;
 
-                    // Verifica se lat e lon existem antes de desenhar
-                    if (celula.lat && celula.lon) {
-                        L.marker([celula.lat, celula.lon], { icon: gerarIconeCustomizado(celula.status) })
-                            .addTo(map)
-                            .bindPopup(conteudoPopup);
-                    }
-                });
-            } catch (erro) {
-                console.error("Erro ao carregar clubinhos:", erro);
+            // Verifica se lat e lon existem antes de desenhar
+            if (celula.lat && celula.lon) {
+              L.marker([celula.lat, celula.lon], {
+                icon: gerarIconeCustomizado(celula.status),
+              })
+                .addTo(map)
+                .bindPopup(conteudoPopup);
             }
+          });
+        } catch (erro) {
+          console.error("Erro ao carregar clubinhos:", erro);
         }
+      }
 
-        // Executa a função ao abrir a página
-        carregarDadosDoBanco();
+      // Executa a função ao abrir a página
+      carregarDadosDoBanco();
     </script>
-</body>
+  </body>
 </html>

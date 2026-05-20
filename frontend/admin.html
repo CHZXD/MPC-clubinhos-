@@ -87,28 +87,39 @@
         <label>Instagram:</label>
         <input type="text" id="instagram" placeholder="@seu.clubinho" required />
 
-        <label>Dia de Funcionamento:</label>
-        <select id="dia" required>
-            <option value="" disabled selected>Selecione um dia</option>
-            <option value="Segunda-feira">Segunda-feira</option>
-            <option value="Terça-feira">Terça-feira</option>
-            <option value="Quarta-feira">Quarta-feira</option>
-            <option value="Quinta-feira">Quinta-feira</option>
-            <option value="Sexta-feira">Sexta-feira</option>
+        <label>Adicionar um Horário</label>
+
+        <label>Dia da Semana:</label>
+        <select id="dia-funcionamento">
+            <option value="" selected>Selecione o dia</option>
+            <option value="Segunda">Segunda</option>
+            <option value="Terça">Terça</option>
+            <option value="Quarta">Quarta</option>
+            <option value="Quinta">Quinta</option>
+            <option value="Sexta">Sexta</option>
             <option value="Sábado">Sábado</option>
             <option value="Domingo">Domingo</option>
         </select>
 
-        <label>Horário de Início:</label>
-        <input type="time" id="horario" required />
+        <label>Horário:</label>
+        <input type="time" id="horario-unico" />
+
+        <button type="button" id="btn-adicionar-horario" class="btn-save" style="margin-top:16px;">
+            Adicionar Horário
+        </button>
+
+        <div id="lista-horarios" style="margin-top:14px;"></div>
+
+        <div class="hint" style="margin-top:10px;">
+            Os itens serão enviados no campo <b>horarios</b> como array de objetos.
+        </div>
     </form>
 </div>
 
 <script>
     const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas';
 
-    // Usado apenas para facilitar edição dos IDs fixos antigos (1..6)
-    // No CRUD real, o correto é editar os dados do banco após carregar o select.
+    // Mantido por compatibilidade com seu fluxo atual de PUT (1..6).
     const dadosBase = {
         "1": { nome: "FIRE", endereco: "704/904 Seps Eq 702/902", lat: -15.802449786329907, lon: -47.89940310012991, status: "ATIVO" },
         "2": { nome: "AVIVA CEMSO", endereco: "Mod D - Asa Sul", lat: -15.815634955806981, lon: -47.91962608473196, status: "ATIVO" },
@@ -117,6 +128,8 @@
         "5": { nome: "NVC", endereco: "Plano Piloto (64MH+M4)", lat: -15.763914498737428, lon: -47.87207721349224, status: "ACOMPANHADO" },
         "6": { nome: "Vinde", endereco: "Ceilândia (5V4X+99)", lat: -15.843889802538921, lon: -48.1016329911501, status: "ATIVO" }
     };
+
+    const stateHorarios = [];
 
     function atualizarCamposNovo() {
         const caixaNovo = document.getElementById('campos-novo');
@@ -129,6 +142,56 @@
         document.getElementById('novo-endereco').required = isNovo;
     }
 
+    function clearListaHorarios() {
+        document.getElementById('lista-horarios').innerHTML = '';
+    }
+
+    function renderListaHorarios() {
+        clearListaHorarios();
+
+        stateHorarios.forEach((item, idx) => {
+            const dia = item?.dia || '';
+            const horario = item?.horario || '';
+
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.justifyContent = 'space-between';
+            row.style.gap = '10px';
+            row.style.background = '#fff';
+            row.style.border = '1px solid #ccc';
+            row.style.borderRadius = '8px';
+            row.style.padding = '10px';
+            row.style.marginTop = '8px';
+
+            const text = document.createElement('div');
+            text.style.fontWeight = 'bold';
+            text.textContent = `${dia} - ${horario}`;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'Remover';
+            btn.className = 'btn-delete';
+            btn.style.width = 'auto';
+            btn.style.padding = '8px 12px';
+
+            btn.addEventListener('click', () => {
+                stateHorarios.splice(idx, 1);
+                renderListaHorarios();
+            });
+
+            row.appendChild(text);
+            row.appendChild(btn);
+            document.getElementById('lista-horarios').appendChild(row);
+        });
+    }
+
+    function resetAdicionarCampos() {
+        document.getElementById('dia-funcionamento').value = '';
+        document.getElementById('horario-unico').value = '';
+        document.getElementById('dia-funcionamento').focus();
+    }
+
     async function carregarCelulasNoSelect() {
         const select = document.getElementById('celula-id');
         const valorAtual = select.value;
@@ -136,7 +199,6 @@
         const resposta = await fetch(API_BASE);
         const celulas = await resposta.json();
 
-        // Limpa opções mantendo a de “novo”
         select.innerHTML = '<option value="novo" style="font-weight: bold; color: blue;">➕ CADASTRAR NOVO CLUBINHO</option>';
 
         celulas.forEach(c => {
@@ -147,7 +209,6 @@
             select.appendChild(opt);
         });
 
-        // tenta manter seleção se existir
         const existe = Array.from(select.options).some(o => o.value === valorAtual);
         if (existe) select.value = valorAtual;
 
@@ -162,12 +223,20 @@
         try {
             const resposta = await fetch(`${API_BASE}/${idSelecionado}`);
             if (!resposta.ok) return;
+
             const c = await resposta.json();
 
             document.getElementById('telefone').value = c.telefone || '';
             document.getElementById('instagram').value = c.instagram || '';
-            document.getElementById('dia').value = c.diaFuncionamento || '';
-            document.getElementById('horario').value = c.horario || '';
+
+            stateHorarios.length = 0;
+            if (Array.isArray(c.horarios)) {
+                c.horarios.forEach(x => {
+                    if (x && x.dia && x.horario) stateHorarios.push({ dia: x.dia, horario: x.horario });
+                });
+            }
+
+            renderListaHorarios();
         } catch (e) {
             // fallback: nada
         }
@@ -193,32 +262,57 @@
 
             alert('✅ Exclusão realizada!');
             document.getElementById('form-celula').reset();
+            document.getElementById('campos-novo').style.display = 'none';
             document.getElementById('celula-id').value = 'novo';
             atualizarCamposNovo();
-            await carregarCelulasNoSelect();
 
-            // força o browser a atualizar os campos do formulário
+            stateHorarios.length = 0;
+            clearListaHorarios();
+
             document.getElementById('telefone').value = '';
             document.getElementById('instagram').value = '';
-            document.getElementById('dia').value = '';
-            document.getElementById('horario').value = '';
+
+            await carregarCelulasNoSelect();
         } catch (err) {
             alert('🔌 Erro de conexão ao excluir.');
         }
     }
 
-    // Init
+    document.getElementById('btn-excluir').addEventListener('click', excluirSelecionado);
+
+    document.getElementById('btn-adicionar-horario').addEventListener('click', () => {
+        const dia = document.getElementById('dia-funcionamento').value;
+        const horario = document.getElementById('horario-unico').value;
+
+        if (!dia) {
+            alert('Selecione um dia da semana.');
+            return;
+        }
+        if (!horario) {
+            alert('Selecione um horário.');
+            return;
+        }
+
+        stateHorarios.push({ dia, horario });
+        renderListaHorarios();
+        resetAdicionarCampos();
+    });
+
     document.getElementById('celula-id').addEventListener('change', async () => {
         atualizarCamposNovo();
         await carregarDadosSelecionadosNoForm();
     });
 
-    document.getElementById('btn-excluir').addEventListener('click', excluirSelecionado);
-
-    document.getElementById('form-celula').addEventListener('submit', async function(e) {
+    document.getElementById('form-celula').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const idSelecionado = document.getElementById('celula-id').value;
+        const horariosArr = stateHorarios.map(x => ({ dia: x.dia, horario: x.horario }));
+
+        if (horariosArr.length === 0) {
+            alert('Adicione pelo menos 1 horário.');
+            return;
+        }
 
         let payload = null;
         let metodo = 'POST';
@@ -241,14 +335,9 @@
                 status: document.getElementById('novo-status').value,
                 telefone: document.getElementById('telefone').value,
                 instagram: document.getElementById('instagram').value,
-                diaFuncionamento: document.getElementById('dia').value,
-                horario: document.getElementById('horario').value
+                horarios: horariosArr
             };
         } else {
-            // Para PUT, usamos dados do banco quando carregado pelo select.
-            // Como o frontend não guarda todos os campos do registro, mantemos o básico
-            // via dadosBase apenas para 1..6 (se não existir, usa fallback do formulário).
-            // O endpoint PUT salva tudo que enviamos.
             const infoBase = dadosBase[idSelecionado] || {
                 nome: '',
                 endereco: '',
@@ -265,8 +354,7 @@
                 status: infoBase.status,
                 telefone: document.getElementById('telefone').value,
                 instagram: document.getElementById('instagram').value,
-                diaFuncionamento: document.getElementById('dia').value,
-                horario: document.getElementById('horario').value
+                horarios: horariosArr
             };
 
             metodo = 'PUT';
@@ -280,15 +368,20 @@
                 body: JSON.stringify(payload)
             });
 
-            if (resposta.ok) {
-                alert('✅ Salvo com sucesso!');
-                document.getElementById('form-celula').reset();
-                document.getElementById('campos-novo').style.display = 'none';
-                await carregarCelulasNoSelect();
-            } else {
+            if (!resposta.ok) {
                 const text = await resposta.text().catch(() => '');
                 alert(`❌ Erro ao salvar. ${text}`.trim());
+                return;
             }
+
+            alert('✅ Salvo com sucesso!');
+            document.getElementById('form-celula').reset();
+            document.getElementById('campos-novo').style.display = 'none';
+
+            stateHorarios.length = 0;
+            clearListaHorarios();
+
+            await carregarCelulasNoSelect();
         } catch (erro) {
             console.error(erro);
             alert('🔌 Erro de conexão!');
@@ -298,6 +391,8 @@
     window.addEventListener('DOMContentLoaded', async () => {
         atualizarCamposNovo();
         await carregarCelulasNoSelect();
+        stateHorarios.length = 0;
+        clearListaHorarios();
     });
 </script>
 </body>
