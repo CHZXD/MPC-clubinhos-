@@ -23,7 +23,6 @@
         .btn-secondary:hover { background-color: #f1f5f9; border-color: #94a3b8; }
         .btn-delete { background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
         .btn-delete:hover { background-color: #fecaca; }
-        #campos-novo { display: none; background-color: #f8fafc; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px dashed #94a3b8; }
         .warning-text { font-size: 12px; color: #ef4444; margin-top: 6px; font-weight: 500; }
         .row-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;}
         .horario-item { display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -40,7 +39,7 @@
     </a>
 
     <h2>Gestão de Clubinhos</h2>
-    <div class="hint">Gerencie os locais e horários das células de forma rápida.</div>
+    <div class="hint">Adicione novos locais ou edite os dados (nome, endereço, coordenadas) dos clubinhos existentes.</div>
 
     <label for="celula-id">Selecione o Clubinho:</label>
     <select id="celula-id" required>
@@ -55,30 +54,33 @@
     <hr class="divider" />
 
     <form id="form-celula">
-        <div id="campos-novo">
-            <label for="novo-nome">Nome do Clubinho</label>
-            <input type="text" id="novo-nome" placeholder="Ex: Clubinho Taguatinga" />
-            <label for="novo-endereco">Endereço / Referência</label>
-            <input type="text" id="novo-endereco" placeholder="Ex: QNB 12, Casa 5" />
-            <label for="novo-lat">Latitude</label>
-            <input type="text" id="novo-lat" placeholder="Ex: -15.8339" />
-            <div class="warning-text">⚠️ Use negativo (ex: -15.8)</div>
-            <label for="novo-lon">Longitude</label>
-            <input type="text" id="novo-lon" placeholder="Ex: -47.9391" />
-            <div class="warning-text">⚠️ Use negativo (ex: -47.9)</div>
-            <label for="novo-status">Status Inicial</label>
-            <select id="novo-status">
-                <option value="ATIVO">Ativo</option>
-                <option value="ACOMPANHADO">Acompanhado</option>
-                <option value="SEM INFORMAÇÕES">Sem Informações</option>
-                <option value="DESATIVADO">Desativado</option>
-            </select>
-        </div>
+        <label for="novo-nome">Nome do Clubinho</label>
+        <input type="text" id="novo-nome" placeholder="Ex: Clubinho Taguatinga" required />
+        
+        <label for="novo-endereco">Endereço / Referência</label>
+        <input type="text" id="novo-endereco" placeholder="Ex: QNB 12, Casa 5" required />
+        
+        <label for="novo-lat">Latitude</label>
+        <input type="text" id="novo-lat" placeholder="Ex: -15.8339" required />
+        <div class="warning-text">⚠️ Use negativo (ex: -15.8)</div>
+        
+        <label for="novo-lon">Longitude</label>
+        <input type="text" id="novo-lon" placeholder="Ex: -47.9391" required />
+        <div class="warning-text">⚠️ Use negativo (ex: -47.9)</div>
+        
+        <label for="novo-status">Status</label>
+        <select id="novo-status">
+            <option value="ATIVO">Ativo</option>
+            <option value="ACOMPANHADO">Acompanhado</option>
+            <option value="SEM INFORMAÇÕES">Sem Informações</option>
+            <option value="DESATIVADO">Desativado</option>
+        </select>
 
         <label for="telefone">Telefone (WhatsApp)</label>
-        <input type="tel" id="telefone" placeholder="(61) 90000-0000" required />
+        <input type="tel" id="telefone" placeholder="(61) 90000-0000" />
+        
         <label for="instagram">Instagram</label>
-        <input type="text" id="instagram" placeholder="@seu.clubinho" required />
+        <input type="text" id="instagram" placeholder="@seu.clubinho" />
 
         <hr class="divider" />
         <h3 style="font-size: 15px; margin: 0; color: #0f172a; font-weight: 700;">Horários</h3>
@@ -120,16 +122,6 @@
     const API_BASE = 'https://mapa-celulas-v2.onrender.com/api/celulas'; 
     const stateHorarios = [];
 
-    function atualizarCamposNovo() {
-        const caixaNovo = document.getElementById('campos-novo');
-        const isNovo = document.getElementById('celula-id').value === 'novo';
-        caixaNovo.style.display = isNovo ? 'block' : 'none';
-        document.getElementById('novo-nome').required = isNovo;
-        document.getElementById('novo-lat').required = isNovo;
-        document.getElementById('novo-lon').required = isNovo;
-        document.getElementById('novo-endereco').required = isNovo;
-    }
-
     function renderListaHorarios() {
         const lista = document.getElementById('lista-horarios');
         lista.innerHTML = '';
@@ -153,7 +145,6 @@
         const select = document.getElementById('celula-id');
         const valorAtual = select.value;
         
-        // Bloqueio de cache forçado para buscar sempre a lista atualizada
         const resposta = await fetch(API_BASE, { cache: 'no-store' });
         const celulas = await resposta.json();
         
@@ -166,20 +157,29 @@
         });
         
         if (Array.from(select.options).some(o => o.value === valorAtual)) select.value = valorAtual;
-        atualizarCamposNovo();
-        await carregarDadosSelecionadosNoForm();
+        
+        if (select.value !== 'novo') {
+            await carregarDadosSelecionadosNoForm();
+        }
     }
 
     async function carregarDadosSelecionadosNoForm() {
         const idSelecionado = document.getElementById('celula-id').value;
         if (idSelecionado === 'novo') return;
         try {
-            // Anti-cache aqui também
             const resposta = await fetch(`${API_BASE}/${idSelecionado}`, { cache: 'no-store' });
             if (!resposta.ok) return;
             const c = await resposta.json();
+            
+            // Preencher todos os campos com os dados existentes para edição
+            document.getElementById('novo-nome').value = c.nome || '';
+            document.getElementById('novo-endereco').value = c.endereco || '';
+            document.getElementById('novo-lat').value = c.lat || '';
+            document.getElementById('novo-lon').value = c.lon || '';
+            document.getElementById('novo-status').value = c.status || 'SEM INFORMAÇÕES';
             document.getElementById('telefone').value = c.telefone || '';
             document.getElementById('instagram').value = c.instagram || '';
+            
             stateHorarios.length = 0;
             if (c.horarios && typeof c.horarios === 'string') {
                 c.horarios.split(';').forEach(item => {
@@ -200,9 +200,16 @@
         document.getElementById('horario-unico').value = '';
     });
 
-    document.getElementById('celula-id').addEventListener('change', carregarDadosSelecionadosNoForm);
+    document.getElementById('celula-id').addEventListener('change', async () => {
+        if (document.getElementById('celula-id').value === 'novo') {
+            document.getElementById('form-celula').reset();
+            stateHorarios.length = 0;
+            renderListaHorarios();
+        } else {
+            await carregarDadosSelecionadosNoForm();
+        }
+    });
 
-    // FUNÇÃO EXCLUIR ATUALIZADA (Tratamento de Erros Ocultos + Reset completo)
     document.getElementById('btn-excluir').addEventListener('click', async () => {
         const idSelecionado = document.getElementById('celula-id').value;
         if (idSelecionado === 'novo') { alert('Selecione uma célula existente para excluir.'); return; }
@@ -210,55 +217,50 @@
 
         try {
             const resposta = await fetch(`${API_BASE}/${idSelecionado}`, { method: 'DELETE' });
-            
-            // Verificação rigorosa de erros
-            if (!resposta.ok) {
-                const erroServidor = await resposta.text();
-                throw new Error(erroServidor || 'O servidor recusou a exclusão.');
-            }
+            if (!resposta.ok) throw new Error('O servidor recusou a exclusão.');
             
             alert('✅ Excluído com sucesso!');
-            
-            // Forçar o UI a voltar para o modo "Novo Cadastro" de imediato
             document.getElementById('form-celula').reset();
             document.getElementById('celula-id').value = 'novo';
             stateHorarios.length = 0;
             renderListaHorarios();
-            atualizarCamposNovo();
-            
-            // Recarregar Select pedindo dados frescos à API
             await carregarCelulasNoSelect();
-            
-        } catch (err) { 
-            console.error(err);
-            alert('Erro ao excluir: ' + err.message); 
-        }
+        } catch (err) { alert('Erro ao excluir: ' + err.message); }
     });
 
     document.getElementById('form-celula').addEventListener('submit', async function (e) {
         e.preventDefault();
         const idSelecionado = document.getElementById('celula-id').value;
         const horariosArr = stateHorarios.map(x => ({ dia: x.dia, horario: x.horario }));
-        let payload = { telefone: document.getElementById('telefone').value, instagram: document.getElementById('instagram').value, horarios: horariosArr };
-
-        if (idSelecionado === 'novo') {
-            payload.nome = document.getElementById('novo-nome').value;
-            payload.endereco = document.getElementById('novo-endereco').value;
-            payload.lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
-            payload.lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
-            payload.status = document.getElementById('novo-status').value;
-        } else {
-            const resp = await fetch(`${API_BASE}/${idSelecionado}`, { cache: 'no-store' });
-            const antigo = await resp.json();
-            payload = { ...antigo, ...payload };
+        
+        const lat = parseFloat(document.getElementById('novo-lat').value.replace(',', '.'));
+        const lon = parseFloat(document.getElementById('novo-lon').value.replace(',', '.'));
+        
+        if (Number.isNaN(lat) || Number.isNaN(lon)) {
+            alert('Erro: Latitude e Longitude devem ser numéricas!');
+            return;
         }
+
+        const payload = { 
+            nome: document.getElementById('novo-nome').value,
+            endereco: document.getElementById('novo-endereco').value,
+            lat: lat,
+            lon: lon,
+            status: document.getElementById('novo-status').value,
+            telefone: document.getElementById('telefone').value, 
+            instagram: document.getElementById('instagram').value, 
+            horarios: horariosArr 
+        };
 
         const url = idSelecionado === 'novo' ? API_BASE : `${API_BASE}/${idSelecionado}`;
         const metodo = idSelecionado === 'novo' ? 'POST' : 'PUT';
         
-        await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        alert('✅ Salvo!');
-        window.location.href = 'index.html';
+        try {
+            const resposta = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!resposta.ok) throw new Error('Falha na API');
+            alert('✅ Salvo com sucesso!');
+            window.location.href = 'index.html';
+        } catch (error) { alert('Erro ao salvar os dados.'); }
     });
 
     window.addEventListener('DOMContentLoaded', carregarCelulasNoSelect);
