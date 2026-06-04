@@ -146,7 +146,14 @@
         const valorAtual = select.value;
         
         const resposta = await fetch(API_BASE, { cache: 'no-store' });
-        const celulas = await resposta.json();
+        let celulas = await resposta.json();
+        
+        // === CÓDIGO ADICIONADO: Ordena a lista em ordem alfabética pelo nome ===
+        celulas.sort((a, b) => {
+            const nomeA = (a.nome || 'Sem nome').toLowerCase();
+            const nomeB = (b.nome || 'Sem nome').toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        });
         
         select.innerHTML = '<option value="novo" style="font-weight: bold; color: #2563eb;">Novo Cadastro</option>';
         celulas.forEach(c => {
